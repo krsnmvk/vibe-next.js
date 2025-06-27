@@ -18,7 +18,7 @@ export default function Home() {
   );
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
+    <div className="p-4 max-w-7xl space-y-3 mx-auto">
       <Input
         type="text"
         value={value}
