@@ -13,3 +13,38 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  user
+  assistant
+}
+
+enum Type {
+  result
+  error
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  content   String
+  role      Role
+  type      Type
+  fragment  Fragment?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("message")
+}
+
+model Fragment {
+  id         String   @id @default(cuid())
+  title      String
+  files      Json
+  sandboxUrl String   @map("sandbox_url")
+  messageId  String   @unique @map("message_id")
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("fragment")
+}
