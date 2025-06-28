@@ -3,37 +3,40 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTRPC } from '@/trpc/client';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Home() {
   const [value, setValue] = useState('');
 
+  const router = useRouter();
+
   const trpc = useTRPC();
   const { mutate, isPending } = useMutation(
-    trpc.messages.create.mutationOptions({
-      onSuccess: () => toast.success('Message created'),
+    trpc.projects.create.mutationOptions({
+      onSuccess: (data) => router.push(`/projects/${data.id}`),
+      onError: (err) => toast.error(err.message),
     })
   );
 
-  const { data } = useQuery(trpc.messages.getMany.queryOptions());
-
   return (
-    <div className="p-4 max-w-7xl space-y-3 mx-auto">
-      <Input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <Button
-        type="button"
-        onClick={() => mutate({ value: value })}
-        disabled={isPending}
-      >
-        Invoke Background Jobs
-      </Button>
-      <div>{JSON.stringify(data, null, 2)}</div>
+    <div className="h-screen w-screen flex items-center justify-center">
+      <div className="max-w-7xl mx-auto flex flex-col gap-y-4 items-center justify-center">
+        <Input
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <Button
+          type="button"
+          onClick={() => mutate({ value: value })}
+          disabled={isPending}
+        >
+          submit
+        </Button>
+      </div>
     </div>
   );
 }
